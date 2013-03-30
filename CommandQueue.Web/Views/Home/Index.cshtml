@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "Command Queue";
+}
+
+<h2>Simulations</h2>
+
+<div class="row-fluid">
+        
+    <div class="span4">
+        <h3>Example .1</h3>
+        <p>A blog post's reply form.</p>
+        <textarea id="reply" placeholder="Leave reply" rows="4" class="input-xlarge">I really like this post, but you've gott a lot of typos. Pleaz fix them.</textarea>
+        <input type="email" id="emailAddress" placeholder="Email address" class="input-xlarge" value="test@test.com">
+        <button type="button" class="btn" id="leaveReply"><i class="icon-edit"></i> Leave Reply</button>
+        <div id="exampleOneOutput"></div>
+    </div>
+        
+    <div class="span4">
+        <h3>Example .2</h3>
+        <p>A basic "complaint" form.</p>
+        <input type="text" id="fullName" placeholder="Name" class="input-xlarge" value="Barb Dwyer">
+        <textarea id="complaint" placeholder="Your complaint" rows="4" class="input-xlarge">The cup holder on the PC you sold me is broken.</textarea>
+        <select id="level" class="input-xlarge">
+            <option value="ignore">Really severe complaint</option>
+            <option value="ignore">Mildly severe complaint</option>
+            <option value="ignore">So-so severe complaint</option>
+            <option value="top-priority">Meh-level complaint</option>
+        </select>
+        <button type="button" class="btn" id="sendComplaint"><i class="icon-envelope"></i> Send Complaint</button>
+        <div id="exampleTwoOutput"></div>
+    </div>
+
+    <div class="span4">
+        <h3>Example .3</h3>
+        <p>
+            Lookup total online reviews, and email them to me, for...:
+        </p>
+        <label class="radio">
+            <input type="radio" name="targetMovie" id="Avatar" value="Avatar (2009)" checked="checked">
+            Avatar
+        </label>
+        <label class="radio">
+            <input type="radio" name="targetMovie" id="RearWindow" value="Rear Window (1954)">
+            Rear Window
+        </label>
+        <label class="radio">
+            <input type="radio" name="targetMovie" id="SantaClausConquersTheMartians" value="Santa Claus Conquers the Martians (1964)">
+            Santa Claus Conquers the Martians
+        </label>
+        <input type="email" id="movieEmailAddress" placeholder="Email address" class="input-xlarge" value="bigmoviefan@test.com">
+        <button type="button" class="btn" id="lookupAndEmail"><i class="icon-film"></i> Lookup and Email</button>
+        <div id="exampleThreeOutput"></div>
+    </div>
+</div>
+
+@section Scripts 
+{
+    <script type="text/javascript">
+
+        $('#leaveReply').click(function () {
+
+            var jsonData =
+            {
+                Reply: $('#reply').val(),
+                EmailAddress: $('#fullName').val()
+            };
+
+            ajaxIt('blog-post/leave-reply/', jsonData, 'exampleOneOutput', 'Reply left');
+        });
+
+        $('#sendComplaint').click(function () {
+
+            var jsonData =
+            {
+                FullName: $('#fullName').val(),
+                Complaint: $('#complaint').val(),
+                Level: $('#level').val()
+            };
+
+            ajaxIt('complaint/send-complaint/', jsonData, 'exampleTwoOutput', 'Complaint sent');
+        });
+
+        $('#lookupAndEmail').click(function () {
+
+            var jsonData =
+            {
+                MovieTitleAndReleaseYear: $('input:radio[name=targetMovie]:checked').val(),
+                EmailAddress: $('#movieEmailAddress').val()
+            };
+
+            ajaxIt('movie/lookup/', jsonData, 'exampleThreeOutput', 'Lookup request sent');
+        });
+
+        function ajaxIt(apiPath, jsonData, outputId, message) {
+
+            var startTime = new Date();
+
+            $.ajax({
+                type: 'POST',
+                url: '/api/' + apiPath,
+                data: JSON.stringify(jsonData),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+            }).fail(function (error) {
+                var timeDifferenceInMilliseconds = new Date() - startTime;
+
+                // NOTE: Setting the data type to "Json" when the return is empty results in an error, hence the fail(). 
+                // Use the Http status codes to determine a successful/unsuccessful outcome.
+                if (error.status == 200) {
+                    WriteSuccessOutput(outputId, message, timeDifferenceInMilliseconds);
+                } else {
+                    WriteErrorOutput(outputId, error.status, timeDifferenceInMilliseconds);
+                }
+            });
+        }
+
+        function WriteSuccessOutput(divId, message, timeDifferenceInMilliseconds) {
+            WriteOutput(divId, message, timeDifferenceInMilliseconds, 'label-success');
+        }
+
+        function WriteErrorOutput(divId, message, timeDifferenceInMilliseconds) {
+            WriteOutput(divId, 'Error: ' + message, timeDifferenceInMilliseconds, 'label-important');
+        }
+
+        function WriteOutput(divId, message, timeDifferenceInMilliseconds, className) {
+            $('#' + divId).prepend('<span class="label ' + className + '">' + message + ', ' + timeDifferenceInMilliseconds + 'ms</span><br/>');
+        }
+
+    </script>
+}

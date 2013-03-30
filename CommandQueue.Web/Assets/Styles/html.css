@@ -1,0 +1,15 @@
+﻿body {
+    padding: 20px 40px 4px 40px;
+}
+
+button,
+input,
+input[type="email"],
+select,
+textarea {
+    display: block;
+}
+
+.btn {
+    margin-bottom: 10px;
+}
