@@ -16,7 +16,7 @@ namespace CommandQueue.Domain.Services
             string reply,
             string emailAddress)
         {
-            // Persist the data in table storage.
+            // Persist the data to table storage.
             var blogPostReplyEntity = new BlogPostReplyEntity
                 {
                     Reply = reply,
@@ -28,7 +28,7 @@ namespace CommandQueue.Domain.Services
 
             // Create the command object.
             var dispatchMessageCommand = new NewBlogPostReplyCommand
-                {
+                {  
                     BlogPostReplyEntity = blogPostReplyEntity
                 };
 
