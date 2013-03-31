@@ -5,8 +5,6 @@ using System.Diagnostics;
 
 namespace CommandQueue.Domain.Model
 {
-    // This is a Receiver, acting on a request from a Command object.
-
     public class BlogPostReplyEntity : TableEntity
     {
         public string Reply { get; set; }
